@@ -4,6 +4,7 @@ Projeto da disciplina de Programação para Dispositivos Móveis
 ## 💻 Requerimentos
 - [Node](https://nodejs.org/)
 - [Yarn](https://yarnpkg.com/)
+- [Expo](https://expo.dev/)
 
 ## 🚀 Instalação
 
