@@ -7,6 +7,8 @@ import {
   Image,
   SafeAreaView,
   Dimensions,
+  ToastAndroid,
+  Keyboard,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as Yup from 'yup';
@@ -47,11 +49,13 @@ export function Login() {
 
     if (
       isValid &&
-      email.toLowerCase() == 'teste@teste.com' &&
+      email.toLowerCase() == 'a@a.com' &&
       password.toLowerCase() == '123456'
     ) {
       setError('');
+      Keyboard.dismiss();
       await new Promise((resolve) => setTimeout(resolve, 4000));
+      ToastAndroid.show('Bem-Vindo', ToastAndroid.SHORT);
       navigation.navigate('Main');
     }
 

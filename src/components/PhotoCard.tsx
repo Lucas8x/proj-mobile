@@ -1,6 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Share,
+} from 'react-native';
 import { Entypo } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 import { IPhotoPost } from '../interfaces/IPhotoPost';
 
@@ -9,24 +17,44 @@ interface PhotoCard {
 }
 
 export function PhotoCard({ data, ...rest }: PhotoCard) {
+  const navigation = useNavigation();
+
+  function handleNavigateToProfile() {
+    navigation.navigate('Profile', { user_id: data.user.id });
+  }
+
+  function handleSharePhoto() {
+    Share.share({
+      message: data.url,
+    });
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.userInfo}>
+        <TouchableOpacity
+          style={styles.userInfo}
+          onPress={handleNavigateToProfile}
+        >
           <Image
             style={styles.avatar}
-            source={{ uri: data.user.avatar }}
+            source={{ uri: data.user.avatar_url }}
             resizeMode='contain'
             resizeMethod='resize'
           />
           <Text style={styles.username}>{data.user.name}</Text>
-        </View>
+        </TouchableOpacity>
 
-        <Entypo name='dots-three-horizontal' size={20} color='white' />
+        <Entypo
+          name='dots-three-horizontal'
+          size={20}
+          color='white'
+          onPress={handleSharePhoto}
+        />
       </View>
       <Image
         style={styles.image}
-        source={{ uri: data.uri }}
+        source={{ uri: data.url }}
         resizeMode='contain'
       />
       <View></View>

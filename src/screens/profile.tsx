@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,20 +10,46 @@ import {
 } from 'react-native';
 import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+
+interface Params {
+  user_id: number;
+}
+
+interface User {
+  id: number;
+  name: string;
+  avatar_url: string;
+  photos: Array<{
+    id: number;
+    url: string;
+  }>;
+}
 
 export const Profile = () => {
   const navigation = useNavigation();
-  const [user, setUser] = useState({
-    name: 'Lucas',
-    avatar: 'https://picsum.photos/100',
-    photos: [
-      { id: 1, uri: 'https://picsum.photos/100' },
-      { id: 2, uri: 'https://picsum.photos/101' },
-      { id: 3, uri: 'https://picsum.photos/102' },
-      { id: 4, uri: 'https://picsum.photos/103' },
-    ],
-  });
+  const route = useRoute();
+  const { user_id } = route.params as Params;
+  const [user, setUser] = useState<User>({} as User);
+
+  async function loadUserData() {
+    const user_data = {
+      id: 123,
+      name: 'Lucas',
+      avatar_url: 'https://picsum.photos/100',
+      photos: [
+        { id: 1, url: 'https://picsum.photos/100/?random' },
+        { id: 2, url: 'https://picsum.photos/100/?random' },
+        { id: 3, url: 'https://picsum.photos/100/?random' },
+        { id: 4, url: 'https://picsum.photos/100/?random' },
+      ],
+    };
+    setUser(user_data);
+  }
+
+  useEffect(() => {
+    loadUserData();
+  }, []);
 
   function handleNavigateBack() {
     navigation.goBack();
@@ -43,7 +69,7 @@ export const Profile = () => {
       <View style={styles.userInfo}>
         <Image
           style={styles.avatar}
-          source={{ uri: user.avatar }}
+          source={{ uri: user.avatar_url }}
           resizeMode='contain'
           resizeMethod='resize'
         />
@@ -57,7 +83,7 @@ export const Profile = () => {
             <Image
               style={styles.photo}
               key={index}
-              source={{ uri: photo.uri }}
+              source={{ uri: photo.url }}
             />
           ))}
       </View>

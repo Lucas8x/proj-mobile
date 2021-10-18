@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { Login } from '../screens/login';
 import { Main } from '../screens/main';
 import { Profile } from '../screens/profile';
+import { NewPost } from '../screens/newpost';
 
 const Stack = createStackNavigator();
 
@@ -17,7 +18,12 @@ export const Routes = () => (
     >
       <Stack.Screen name='Login' component={Login} />
       <Stack.Screen name='Main' component={Main} />
-      <Stack.Screen name='Profile' component={Profile} />
+      <Stack.Screen
+        name='Profile'
+        component={Profile}
+        initialParams={{ user_id: 1 }}
+      />
+      <Stack.Screen name='NewPost' component={NewPost} />
     </Stack.Navigator>
   </NavigationContainer>
 );

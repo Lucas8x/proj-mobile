@@ -13,6 +13,10 @@ export function Header() {
     navigation.navigate('Profile');
   }
 
+  function handleAddNewPost() {
+    navigation.navigate('NewPost');
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
@@ -21,9 +25,15 @@ export function Header() {
       <View style={styles.headerButtonsContainer}>
         <TouchableOpacity
           style={styles.headerButton}
+          onPress={handleAddNewPost}
+        >
+          <Feather name='plus-square' size={26} color='white' />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.headerButton}
           onPress={handleNavigateToProfile}
         >
-          <Feather name='user' size={24} color='white' />
+          <Feather name='user' size={26} color='white' />
         </TouchableOpacity>
       </View>
     </View>
@@ -39,19 +49,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#0C0C0C',
     paddingHorizontal: 20,
     marginTop: Constants.statusBarHeight,
-    borderBottomWidth: 0.3,
+    borderBottomWidth: 0.1,
     borderBottomColor: 'white',
   },
 
-  logoContainer: {},
+  logoContainer: {
+    height: 60,
+    justifyContent: 'center',
+  },
 
   logo: {
-    height: 60,
-    width: 120,
+    height: 50,
+    width: 100,
   },
 
   headerButtonsContainer: {
-    alignItems: 'flex-end',
+    width: '25%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 
   headerButton: {},

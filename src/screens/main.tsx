@@ -4,43 +4,17 @@ import { View, StyleSheet, SafeAreaView, FlatList } from 'react-native';
 import { Header } from '../components/Header';
 import { PhotoCard } from '../components/PhotoCard';
 import { IPhotoPost } from '../interfaces/IPhotoPost';
+import { getPhotos } from '../services/fakeApi';
 
 export const Main = () => {
   const [posts, setPosts] = useState<IPhotoPost[]>([]);
 
-  useEffect(() => {
-    async function loadPosts() {
-      setPosts([
-        {
-          id: 'abc123',
-          likes: 0,
-          uri: 'https://picsum.photos/1000/1350',
-          user: {
-            name: 'Lucas',
-            avatar: 'https://picsum.photos/40',
-          },
-        },
-        {
-          id: 'def456',
-          likes: 0,
-          uri: 'https://picsum.photos/1001/1351',
-          user: {
-            name: 'Carlos',
-            avatar: 'https://picsum.photos/41',
-          },
-        },
+  async function loadPosts() {
+    const response = getPhotos(10);
+    setPosts([...posts, ...response]);
+  }
 
-        {
-          id: 'aaaa',
-          likes: 0,
-          uri: 'https://picsum.photos/1002/1351',
-          user: {
-            name: 'Cleiton',
-            avatar: 'https://picsum.photos/42',
-          },
-        },
-      ]);
-    }
+  useEffect(() => {
     loadPosts();
   }, []);
 
@@ -54,6 +28,8 @@ export const Main = () => {
           renderItem={({ item }) => <PhotoCard data={item} />}
           contentContainerStyle={styles.list}
           ListHeaderComponent={<View />}
+          onEndReached={loadPosts}
+          onEndReachedThreshold={0.2}
         />
       </View>
     </SafeAreaView>
@@ -68,6 +44,6 @@ const styles = StyleSheet.create({
 
   list: {
     marginTop: 10,
-    marginHorizontal: 15,
+    marginBottom: 50,
   },
 });
