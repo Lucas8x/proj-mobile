@@ -16,70 +16,37 @@ import { Button } from 'react-native-elements';
 
 import Logo from '../assets/logo.png';
 
-export function Login() {
+export function SingUp() {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [name, setName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const schema = Yup.object().shape({
-    email: Yup.string().email('Email inválido').required('Email obrigatório'),
-    password: Yup.string()
-      .min(6, 'Senha mínimo de 6 caracteres')
-      .required('Senha obrigatória'),
-  });
-
-  async function validateForm() {
-    schema.validate({ email, password }, { abortEarly: false }).catch((err) => {
-      err.errors.length == 1
-        ? setError(err.message)
-        : setError('Preencha todos os campos');
-    });
-
-    const valid = await schema.isValid({ email, password });
-    if (valid) setError('');
-    return valid;
-  }
 
   async function handleSubmit() {
     setIsSubmitting(true);
-
-    const isValid = await validateForm();
-
-    if (
-      isValid &&
-      email.toLowerCase() == 'a@a.com' &&
-      password.toLowerCase() == '123456'
-    ) {
-      setError('');
-      Keyboard.dismiss();
-      await new Promise((resolve) => setTimeout(resolve, 4000));
-      ToastAndroid.show('Bem-Vindo', ToastAndroid.SHORT);
-      navigation.navigate('Main');
-    }
-
+    Keyboard.dismiss();
+    await new Promise((resolve) => setTimeout(resolve, 4000));
+    ToastAndroid.show('Registrado com Sucesso', ToastAndroid.SHORT);
     setIsSubmitting(false);
+    navigateToLogin();
   }
 
-  function handlePasswordForgot() {
-    //navigation.navigate('');
-  }
-
-  function navigateToRegister() {
-    navigation.navigate('Signup');
+  function navigateToLogin() {
+    navigation.navigate('Login');
   }
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.container}>
         <Image style={styles.logo} source={Logo} resizeMode='contain' />
-        {error ? (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>{error}</Text>
-          </View>
-        ) : null}
-
+        <TextInput
+          style={styles.input}
+          placeholder='Digite seu Nome'
+          onChangeText={setName}
+          placeholderTextColor={'#999'}
+          autoCapitalize='none'
+        />
         <TextInput
           style={styles.input}
           placeholder='Digite seu Email'
@@ -88,6 +55,7 @@ export function Login() {
           autoCapitalize='none'
           keyboardType='email-address'
         />
+
         <TextInput
           style={styles.input}
           placeholder='Digite sua Senha'
@@ -97,19 +65,16 @@ export function Login() {
           secureTextEntry
         />
         <Button
-          containerStyle={styles.loginButton}
-          title={'Entrar'}
+          containerStyle={styles.registerButton}
+          title={'Registrar'}
           loading={isSubmitting}
           onPress={handleSubmit}
         />
-        <Text style={styles.passwordForgot} onPress={handlePasswordForgot}>
-          Esqueceu a senha?
-        </Text>
       </View>
 
       <View style={styles.singupContainer}>
-        <Text style={styles.singupText} onPress={navigateToRegister}>
-          Não tem conta? <Text style={styles.singupTextBold}>Registre-se</Text>
+        <Text style={styles.singupText} onPress={navigateToLogin}>
+          Já possui conta? <Text style={styles.singupTextBold}>Entre</Text>
         </Text>
       </View>
     </SafeAreaView>
@@ -131,20 +96,6 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width * 0.4,
   },
 
-  errorContainer: {
-    width: '70%',
-    backgroundColor: 'red',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'center',
-    borderRadius: 5,
-  },
-  errorText: {
-    padding: 5,
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-  },
-
   input: {
     width: '70%',
     height: 48,
@@ -158,14 +109,9 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
   },
 
-  loginButton: {
+  registerButton: {
     marginTop: 20,
     width: '70%',
-  },
-
-  passwordForgot: {
-    marginTop: 20,
-    color: '#1891F8',
   },
 
   singupContainer: {
