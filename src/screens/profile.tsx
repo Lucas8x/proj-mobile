@@ -11,48 +11,54 @@ import {
 import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import firebase from 'firebase';
+import { PostController } from '../services/firebase';
+import { getUserInfo } from '../utils';
 
 interface Params {
-  user_id: number;
+  user_uid: string;
 }
 
 interface User {
-  id: number;
   name: string;
   avatar_url: string;
-  photos: Array<{
-    id: number;
-    url: string;
-  }>;
+}
+
+interface Photos {
+  id: string;
+  image_url: string;
 }
 
 export const Profile = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { user_id } = route.params as Params;
+  const params = route.params as Params;
+  const user_uid = params.user_uid || firebase.auth().currentUser?.uid || '';
   const [user, setUser] = useState<User>({} as User);
+  const [photos, setPhotos] = useState<Photos[]>([]);
 
   async function loadUserData() {
-    const user_data = {
-      id: 123,
-      name: 'Lucas',
-      avatar_url: 'https://picsum.photos/100',
-      photos: [
-        { id: 1, url: 'https://picsum.photos/100/?random' },
-        { id: 2, url: 'https://picsum.photos/100/?random' },
-        { id: 3, url: 'https://picsum.photos/100/?random' },
-        { id: 4, url: 'https://picsum.photos/100/?random' },
-      ],
-    };
+    const user_data = await getUserInfo(user_uid);
     setUser(user_data);
+  }
+
+  async function getUserPhotos() {
+    const user_photos = await PostController.getUserPosts(user_uid);
+    setPhotos(user_photos);
   }
 
   useEffect(() => {
     loadUserData();
-  }, []);
+    getUserPhotos();
+  }, [user_uid]);
 
   function handleNavigateBack() {
     navigation.goBack();
+  }
+
+  function handleLogout() {
+    firebase.auth().signOut();
+    navigation.navigate('Login' as never, {} as never);
   }
 
   return (
@@ -64,7 +70,9 @@ export const Profile = () => {
           </TouchableOpacity>
         </View>
         <Text style={styles.headerName}>Profile</Text>
-        <View />
+        <TouchableOpacity onPress={handleLogout}>
+          <Ionicons name='exit-outline' size={28} color='white' />
+        </TouchableOpacity>
       </View>
       <View style={styles.userInfo}>
         <Image
@@ -78,12 +86,12 @@ export const Profile = () => {
         </Text>
       </View>
       <View style={styles.userPhotosContainer}>
-        {user.photos &&
-          user.photos.map((photo, index) => (
+        {photos &&
+          photos.map((photo, index) => (
             <Image
               style={styles.photo}
               key={index}
-              source={{ uri: photo.url }}
+              source={{ uri: photo.image_url }}
             />
           ))}
       </View>
@@ -150,5 +158,6 @@ const styles = StyleSheet.create({
   photo: {
     width: Dimensions.get('window').width / 3,
     height: Dimensions.get('window').width / 3,
+    backgroundColor: '#ddd',
   },
 });

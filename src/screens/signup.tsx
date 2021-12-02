@@ -12,9 +12,13 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as Yup from 'yup';
+import uuid from 'uuid';
 import { Button } from 'react-native-elements';
+import firebase from 'firebase';
 
 import Logo from '../assets/logo.png';
+import { translateErrorCode } from '../utils/translateErrorMessage';
+import { writeUserData } from '../services/firebase';
 
 export function SingUp() {
   const navigation = useNavigation();
@@ -23,17 +27,33 @@ export function SingUp() {
   const [name, setName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  function navigateToLogin() {
+    navigation.navigate('Login' as never, {} as never);
+  }
+
   async function handleSubmit() {
     setIsSubmitting(true);
     Keyboard.dismiss();
-    await new Promise((resolve) => setTimeout(resolve, 4000));
-    ToastAndroid.show('Registrado com Sucesso', ToastAndroid.SHORT);
-    setIsSubmitting(false);
-    navigateToLogin();
-  }
+    const auth = firebase.auth();
+    try {
+      const newUser = await auth.createUserWithEmailAndPassword(
+        email,
+        password
+      );
 
-  function navigateToLogin() {
-    navigation.navigate('Login');
+      await writeUserData({
+        uid: newUser.user?.uid,
+        name,
+        avatar_url: `https://picsum.photos/40?random=${uuid.v4()}`,
+      });
+      auth.currentUser?.updateProfile({ displayName: name });
+
+      ToastAndroid.show('Registrado com Sucesso.', ToastAndroid.LONG);
+      //navigateToLogin();
+    } catch (error) {
+      ToastAndroid.show(translateErrorCode(error.code), ToastAndroid.LONG);
+    }
+    setIsSubmitting(false);
   }
 
   return (

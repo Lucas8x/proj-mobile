@@ -10,11 +10,11 @@ export function Header() {
   const navigation = useNavigation();
 
   function handleNavigateToProfile() {
-    navigation.navigate('Profile');
+    navigation.navigate('Profile' as never, {} as never);
   }
 
   function handleAddNewPost() {
-    navigation.navigate('NewPost');
+    navigation.navigate('NewPost' as never, {} as never);
   }
 
   return (

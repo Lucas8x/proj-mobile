@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,28 +6,43 @@ import {
   Image,
   TouchableOpacity,
   Share,
+  ActivityIndicator,
 } from 'react-native';
-import { Entypo } from '@expo/vector-icons';
+import { Entypo, Feather, AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
-import { IPhotoPost } from '../interfaces/IPhotoPost';
-
-interface PhotoCard {
-  data: IPhotoPost;
+interface Props {
+  data: {
+    image_url: string;
+    likes: number;
+    user: {
+      user_uid: string;
+      name: string;
+      avatar_url: string;
+    };
+  };
 }
 
-export function PhotoCard({ data, ...rest }: PhotoCard) {
+export function PhotoCard({ data, ...rest }: Props) {
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(true);
+  const [liked, setLiked] = useState(false);
 
   function handleNavigateToProfile() {
-    navigation.navigate('Profile', { user_id: data.user.id });
+    navigation.navigate('Profile', { user_uid: data.user.user_uid });
   }
 
   function handleSharePhoto() {
     Share.share({
-      message: data.url,
+      message: data.image_url,
     });
   }
+
+  function handleLike() {
+    setLiked(!liked);
+  }
+
+  function handleNavigateComments() {}
 
   return (
     <View style={styles.container}>
@@ -46,18 +61,52 @@ export function PhotoCard({ data, ...rest }: PhotoCard) {
         </TouchableOpacity>
 
         <Entypo
-          name='dots-three-horizontal'
-          size={20}
+          name='share'
+          size={24}
           color='white'
           onPress={handleSharePhoto}
         />
       </View>
-      <Image
-        style={styles.image}
-        source={{ uri: data.url }}
-        resizeMode='contain'
-      />
-      <View></View>
+      <View style={styles.imageContainer}>
+        <Image
+          style={!loading && styles.image}
+          source={{ uri: data.image_url }}
+          resizeMode='contain'
+          onLoad={() => setLoading(false)}
+        />
+        {loading && <ActivityIndicator size='large' color='#333' />}
+      </View>
+      <View style={styles.footer}>
+        <View style={styles.footerButtons}>
+          <TouchableOpacity style={styles.footerButton} onPress={handleLike}>
+            {!liked ? (<AntDesign name='hearto' size={24} color='white' />) : (
+              <AntDesign name='heart' size={24} color='white' />
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.footerButton}
+            onPress={handleNavigateComments}
+          >
+            <Feather name='message-circle' size={26} color='white' />
+          </TouchableOpacity>
+        </View>
+        <View>
+          <Text style={styles.likesText}>
+            Curtido por{' '}
+            <Text style={styles.boldText}>{data.likes} pessoas </Text>
+          </Text>
+          <Text style={styles.photoDescription}>
+            <Text style={styles.boldText}>{data.user.name}</Text> photo
+            description
+          </Text>
+          <Text style={styles.showAllComments} onPress={handleNavigateComments}>
+            Ver todos os comentários
+          </Text>
+          {/* <Text style={styles.comments}>
+            <Text style={styles.boldText}>some user</Text> another user comment
+          </Text> */}
+        </View>
+      </View>
     </View>
   );
 }
@@ -65,9 +114,9 @@ export function PhotoCard({ data, ...rest }: PhotoCard) {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    maxHeight: 500,
+    maxHeight: 600,
     borderStartColor: 'white',
-    marginBottom: 100,
+    marginBottom: 80,
   },
 
   header: {
@@ -95,6 +144,10 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
 
+  imageContainer: {
+    justifyContent: 'center',
+    height: 500,
+  },
   image: {
     width: '100%',
     height: '100%',
@@ -102,5 +155,35 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
 
-  footer: {},
+  boldText: {
+    fontWeight: 'bold',
+  },
+
+  footer: {
+    height: 50,
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    paddingHorizontal: 15,
+    marginVertical: 10,
+  },
+  footerButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  footerButton: {
+    marginRight: 10,
+  },
+  likesText: {
+    color: 'white',
+  },
+  photoDescription: {
+    color: 'white',
+  },
+  showAllComments: {
+    color: 'gray',
+  },
+  comments: {
+    color: 'white',
+  },
 });

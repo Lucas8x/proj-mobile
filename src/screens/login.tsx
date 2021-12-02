@@ -13,6 +13,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import * as Yup from 'yup';
 import { Button } from 'react-native-elements';
+import firebase from 'firebase';
 
 import Logo from '../assets/logo.png';
 
@@ -36,29 +37,31 @@ export function Login() {
         ? setError(err.message)
         : setError('Preencha todos os campos');
     });
-
-    const valid = await schema.isValid({ email, password });
-    if (valid) setError('');
-    return valid;
+    return await schema.isValid({ email, password });
   }
 
   async function handleSubmit() {
     setIsSubmitting(true);
-
     const isValid = await validateForm();
-
-    if (
-      isValid &&
-      email.toLowerCase() == 'a@a.com' &&
-      password.toLowerCase() == '123456'
-    ) {
+    if (isValid) {
       setError('');
       Keyboard.dismiss();
-      await new Promise((resolve) => setTimeout(resolve, 4000));
-      ToastAndroid.show('Bem-Vindo', ToastAndroid.SHORT);
-      navigation.navigate('Main');
-    }
 
+      firebase
+        .auth()
+        .signInWithEmailAndPassword(email, password)
+        .then(() => {
+          setIsSubmitting(false);
+          ToastAndroid.show('Bem-Vindo', ToastAndroid.SHORT);
+          navigation.navigate('Main' as never, {} as never);
+        })
+        .catch(() => {
+          ToastAndroid.show(
+            'Não foi possivel realizar o login',
+            ToastAndroid.SHORT
+          );
+        });
+    }
     setIsSubmitting(false);
   }
 
@@ -67,7 +70,7 @@ export function Login() {
   }
 
   function navigateToRegister() {
-    navigation.navigate('Signup');
+    navigation.navigate('Signup' as never, {} as never);
   }
 
   return (
