@@ -13,6 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 
 interface Props {
   data: {
+    id: string;
     image_url: string;
     likes: number;
     user: {
@@ -42,7 +43,9 @@ export function PhotoCard({ data, ...rest }: Props) {
     setLiked(!liked);
   }
 
-  function handleNavigateComments() {}
+  function handleNavigateComments() {
+    navigation.navigate('Comments', { post_id: data.id, user: data.user });
+  }
 
   return (
     <View style={styles.container}>
@@ -67,6 +70,7 @@ export function PhotoCard({ data, ...rest }: Props) {
           onPress={handleSharePhoto}
         />
       </View>
+
       <View style={styles.imageContainer}>
         <Image
           style={!loading && styles.image}
@@ -76,10 +80,13 @@ export function PhotoCard({ data, ...rest }: Props) {
         />
         {loading && <ActivityIndicator size='large' color='#333' />}
       </View>
+
       <View style={styles.footer}>
         <View style={styles.footerButtons}>
           <TouchableOpacity style={styles.footerButton} onPress={handleLike}>
-            {!liked ? (<AntDesign name='hearto' size={24} color='white' />) : (
+            {!liked ? (
+              <AntDesign name='hearto' size={24} color='white' />
+            ) : (
               <AntDesign name='heart' size={24} color='white' />
             )}
           </TouchableOpacity>
